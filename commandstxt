@@ -1,0 +1,6 @@
+sudo docker exec -it app-node1 bash
+
+sudo docker exec -it cassandra-node1 nodetool status
+
+sudo docker compose up --build
+

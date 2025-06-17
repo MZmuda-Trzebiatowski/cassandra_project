@@ -1,0 +1,51 @@
+services:
+  cassandra-node1:
+    image: cassandra:4.1
+    container_name: cassandra-node1
+    restart: unless-stopped
+    environment:
+      - CASSANDRA_CLUSTER_NAME=CinemaCluster
+      - CASSANDRA_NUM_TOKENS=256
+      - "MAX_HEAP_SIZE=1G"
+      - "HEAP_NEWSIZE=256M"
+      - CASSANDRA_SEEDS=cassandra-node1
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra-node1
+    networks:
+      - cass-net
+    volumes:
+      - cassandra-node1_data:/var/lib/cassandra
+
+  cassandra-node2:
+    image: cassandra:4.1
+    container_name: cassandra-node2
+    restart: unless-stopped
+    environment:
+      - CASSANDRA_CLUSTER_NAME=CinemaCluster
+      - CASSANDRA_NUM_TOKENS=256
+      - "MAX_HEAP_SIZE=1G"
+      - "HEAP_NEWSIZE=256M"
+      - CASSANDRA_SEEDS=cassandra-node1
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra-node2
+    depends_on:
+      - cassandra-node1
+    networks:
+      - cass-net
+    volumes:
+      - cassandra-node2_data:/var/lib/cassandra
+
+  app-node1:
+    build: ./app
+    container_name: app-node1
+    depends_on:
+      - cassandra-node1
+    networks:
+      - cass-net
+    stdin_open: true
+    tty: true
+
+networks:
+  cass-net:
+
+volumes:
+  cassandra-node1_data:
+  cassandra-node2_data:
